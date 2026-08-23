@@ -88,12 +88,12 @@
         solvedAt: firebase.firestore.FieldValue.serverTimestamp(),
       })
       .catch((err) => {
-        // A denied write here just means this level was already recorded
-        // for this student, Firestore's rules block the second write. That's
-        // expected on a replay, not a real error.
-        if (err.code !== "permission-denied") {
-          console.error("Could not record result", err);
-        }
+        // A "permission-denied" here is expected on a replay, the security
+        // rules block the second write on purpose. It can also mean the
+        // rules (or the database itself) aren't set up correctly though, so
+        // this still logs, just as a warning instead of an error, since a
+        // normal player never has devtools open to see it either way.
+        console.warn("recordResult did not save (may be an expected replay-block):", err.code, err.message);
       });
   }
 
