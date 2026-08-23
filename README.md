@@ -76,7 +76,7 @@ Firebase project).
        match /attempts/{attemptId} {
          allow read: if request.auth != null &&
            (request.auth.uid == resource.data.uid ||
-            request.auth.token.email in ["aarav.agarwal@quarrylane.org"]);
+            request.auth.token.email in ["qlsescaperoom@gmail.com"]);
 
          allow create: if request.auth != null &&
            request.auth.token.email.matches('.*@(quarrylane[.]org|student[.]quarrylane[.]org)$') &&

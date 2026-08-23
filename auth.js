@@ -31,13 +31,20 @@
     return ALLOWED_DOMAINS.some((domain) => lower.endsWith("@" + domain.toLowerCase()));
   }
 
+  // Admin emails (ADMIN_EMAILS in firebase-config.js) can sign in even from
+  // outside the school domains, e.g. a personal Gmail used just to view the
+  // dashboard. Everyone else still needs a school account.
+  function isAllowedUser(user) {
+    return isAllowedDomain(user.email) || ADMIN_EMAILS.includes(user.email);
+  }
+
   auth.onAuthStateChanged((user) => {
     resolved = true;
-    if (user && user.email && isAllowedDomain(user.email)) {
+    if (user && user.email && isAllowedUser(user)) {
       currentUser = user;
     } else {
       if (user) {
-        // Signed in, but not with a school account. Not allowed, back out.
+        // Signed in, but not with a school account or an admin email. Not allowed, back out.
         auth.signOut();
       }
       currentUser = null;
