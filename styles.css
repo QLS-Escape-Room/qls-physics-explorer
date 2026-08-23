@@ -1,0 +1,639 @@
+:root {
+  --bg: #05070d;
+  --panel: #141b2e;
+  --panel-border: #2a3350;
+  --text: #e8ecf7;
+  --text-dim: #9aa4c0;
+  --accent: #5ee1c9;
+  --accent-2: #f2b134;
+  --danger: #ff6b6b;
+  --success: #6bffb0;
+  --radius: 14px;
+  --font-serif: "Lora", Georgia, "Times New Roman", serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+  background: radial-gradient(circle at 20% 0%, #131a30 0%, var(--bg) 60%);
+  color: var(--text);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+header {
+  width: 100%;
+  max-width: 820px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+}
+
+header h1 {
+  font-family: var(--font-serif);
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin: 0;
+  letter-spacing: 0.3px;
+}
+
+#stopwatch {
+  font-variant-numeric: tabular-nums;
+  background: var(--panel);
+  border: 1px solid var(--panel-border);
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-size: 0.95rem;
+  color: var(--accent);
+}
+
+main {
+  width: 100%;
+  max-width: 820px;
+  flex: 1;
+  padding: 0 20px 40px;
+  display: flex;
+  flex-direction: column;
+}
+
+.screen {
+  display: none;
+  flex-direction: column;
+  gap: 18px;
+  animation: fadeIn 0.35s ease;
+}
+
+.screen.active {
+  display: flex;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.card {
+  background: var(--panel);
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius);
+  padding: 22px;
+}
+
+h2 { margin-top: 0; }
+
+p.dim { color: var(--text-dim); line-height: 1.5; }
+
+/* ---------- Landing / welcome screen ---------- */
+
+.landing-card {
+  padding: 26px 24px;
+}
+
+.school-badge {
+  margin: 0 0 20px;
+  color: var(--accent-2);
+  font-family: var(--font-serif);
+  font-size: 2rem;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  text-align: center;
+}
+
+.landing-title {
+  margin: 0 0 16px;
+  font-size: 1.5rem;
+  line-height: 1.2;
+  color: var(--text-dim);
+  font-weight: 600;
+}
+
+.landing-about {
+  color: var(--text-dim);
+  line-height: 1.6;
+  margin: 0 0 12px;
+}
+
+.landing-encourage {
+  margin: 20px 0 24px;
+  padding: 16px 18px;
+  background: rgba(94, 225, 201, 0.06);
+  border: 1px solid rgba(94, 225, 201, 0.25);
+  border-radius: 10px;
+}
+
+.landing-encourage-title {
+  margin: 0 0 8px;
+  color: var(--accent-2);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.landing-encourage p:not(.landing-encourage-title) {
+  margin: 0;
+  color: var(--text);
+  line-height: 1.6;
+  font-size: 0.95rem;
+}
+
+.landing-card h2 {
+  border-top: 1px solid var(--panel-border);
+  padding-top: 22px;
+}
+
+button {
+  font: inherit;
+  cursor: pointer;
+  border: none;
+  border-radius: 10px;
+  padding: 12px 20px;
+  background: var(--accent);
+  color: #04231d;
+  font-weight: 600;
+  transition: transform 0.1s ease, opacity 0.1s ease;
+}
+
+button:hover { opacity: 0.9; }
+button:active { transform: scale(0.97); }
+
+button.secondary {
+  background: transparent;
+  border: 1px solid var(--panel-border);
+  color: var(--text);
+}
+
+button:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* ---------- Room scene ---------- */
+
+.scene-wrap {
+  background: var(--panel);
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius);
+  padding: 18px;
+}
+
+.back-row {
+  margin-bottom: 12px;
+}
+
+.back-row .secondary {
+  padding: 7px 14px;
+  font-size: 0.85rem;
+}
+
+.scene-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 14px;
+}
+
+.scene-icon-badge {
+  font-size: 2rem;
+  line-height: 1;
+}
+
+.scene-header h2 { margin: 0; }
+.scene-header p { margin: 4px 0 0; }
+
+.found-counter {
+  margin-left: auto;
+  align-self: flex-start;
+  white-space: nowrap;
+  background: #1c2540;
+  border: 1px solid var(--panel-border);
+  border-radius: 999px;
+  padding: 6px 12px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-dim);
+}
+
+.found-counter.all-found {
+  color: var(--success);
+  border-color: var(--success);
+}
+
+.scene {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: inset 0 0 0 1px #0006, inset 0 30px 60px -20px #000a, inset 0 -30px 60px -20px #000c;
+  background: #000;
+}
+
+.scene-svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.hotspot { cursor: pointer; }
+.hotspot:focus { outline: none; }
+
+/* Object-in-scene props (basketball, envelope, note, clipboard, sheet music),
+   kept quiet at rest so they blend into the photo; a clearer glow only shows
+   up on hover/focus, once you're already looking at the right spot. */
+.hotspot.prop {
+  filter: drop-shadow(0 0 1.5px var(--prop-glow, #ffe9a8)) drop-shadow(0 0 1px #0006);
+  transition: filter 0.2s ease;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.hotspot.prop:hover,
+.hotspot.prop:focus-visible {
+  filter: drop-shadow(0 0 12px var(--prop-glow, #ffe9a8)) drop-shadow(0 0 2px #000a);
+}
+
+/* Marker props (existing-object hotspots like a lamp or hoop) start almost
+   invisible, so drop-shadow alone is too faint to reveal them on hover,
+   bump their own opacity directly instead. */
+.marker-glow,
+.marker-icon {
+  transition: opacity 0.2s ease;
+}
+
+.hotspot.prop:hover .marker-glow,
+.hotspot.prop:focus-visible .marker-glow {
+  opacity: 0.28;
+}
+
+.hotspot.prop:hover .marker-icon,
+.hotspot.prop:focus-visible .marker-icon {
+  opacity: 0.85;
+}
+
+.hotspot.prop.solved-away {
+  pointer-events: none;
+}
+
+/* AP Physics 1's room asks for objects that are harder to spot than the
+   default, no idle glow or icon hint at all, purely hover-discoverable. */
+.scene-svg.scene-extra-hidden .hotspot.prop {
+  filter: none;
+}
+
+.scene-svg.scene-extra-hidden .marker-glow {
+  opacity: 0.015;
+}
+
+.scene-svg.scene-extra-hidden .marker-icon {
+  opacity: 0.08;
+}
+
+.prop-anim-basketball { animation: basketballSwish 0.9s cubic-bezier(.45,.05,.55,1) forwards !important; }
+.prop-anim-envelope { animation: envelopeSlideIn 0.55s ease-in forwards !important; }
+.prop-anim-flutter { animation: paperFlutter 0.6s ease-out forwards !important; }
+.prop-anim-close { animation: sheetClose 0.5s ease-in forwards !important; }
+
+@keyframes basketballSwish {
+  0% { transform: translateY(0) scale(1) rotate(0deg); opacity: 1; }
+  18% { transform: translateY(-2px) scale(1.03) rotate(-6deg); opacity: 1; }
+  40% { transform: translateY(6px) scale(0.97) rotate(20deg); opacity: 1; }
+  75% { transform: translateY(25px) scale(0.8) rotate(95deg); opacity: 1; }
+  100% { transform: translateY(39px) scale(0.5) rotate(150deg); opacity: 0; }
+}
+
+@keyframes envelopeSlideIn {
+  0% { transform: translateY(0) rotate(4deg) scaleY(1); opacity: 1; }
+  55% { transform: translateY(-16px) rotate(1deg) scaleY(0.75); opacity: 1; }
+  100% { transform: translateY(-32px) rotate(-2deg) scaleY(0.06); opacity: 0; }
+}
+
+@keyframes paperFlutter {
+  0% { transform: translateY(0) rotate(0); opacity: 1; }
+  100% { transform: translateY(-38px) rotate(18deg); opacity: 0; }
+}
+
+@keyframes sheetClose {
+  0% { transform: scaleY(1); opacity: 1; }
+  100% { transform: scaleY(0.05); opacity: 0; }
+}
+
+/* Real-door hotspot (positioned over an actual door in the photo) */
+.hotspot.door-hotspot {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.hotspot.door-hotspot .door-hit {
+  fill: #fff;
+  opacity: 0;
+}
+
+.hotspot.door-hotspot .door-icon {
+  filter: drop-shadow(0 0 8px #000c);
+  animation: pulseGlow 2.2s ease-in-out infinite;
+}
+
+.hotspot.door-hotspot.unlocked .door-icon {
+  animation: pulseGlow 1.2s ease-in-out infinite;
+}
+
+@keyframes pulseGlow {
+  0%, 100% { opacity: 0.75; }
+  50% { opacity: 1; }
+}
+
+.hotspot.shake { animation: shakeHotspot 0.4s ease; }
+
+@keyframes shakeHotspot {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-4px); }
+  40% { transform: translateX(4px); }
+  60% { transform: translateX(-3px); }
+  80% { transform: translateX(3px); }
+}
+
+.scene-hint {
+  margin: 12px 2px 0;
+  font-size: 0.85rem;
+  min-height: 1.2em;
+}
+
+.continue-row {
+  margin-top: 14px;
+  text-align: center;
+}
+
+/* ---------- Puzzle panel ---------- */
+
+.puzzle-panel {
+  background: var(--panel);
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  animation: panelIn 0.25s ease;
+}
+
+@keyframes panelIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.panel-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 18px;
+  font-weight: 600;
+  border-bottom: 1px solid var(--panel-border);
+  background: #1a2340;
+}
+
+.panel-header .panel-icon { font-size: 1.2rem; }
+.panel-header .panel-label { flex: 1; }
+
+.panel-close {
+  background: transparent;
+  border: none;
+  color: var(--text-dim);
+  font-size: 1.3rem;
+  padding: 0 6px;
+  line-height: 1;
+}
+
+.panel-body { padding: 18px; }
+
+.panel-body p.prompt {
+  margin-top: 0;
+  font-size: 1.02rem;
+}
+
+.options {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 12px 0;
+}
+
+.options button {
+  background: #1c2540;
+  color: var(--text);
+  text-align: left;
+  border: 1px solid var(--panel-border);
+}
+
+.options button.correct {
+  background: rgba(110, 255, 176, 0.2);
+  border-color: var(--success);
+}
+
+.options button.wrong {
+  background: rgba(255, 107, 107, 0.2);
+  border-color: var(--danger);
+  animation: shake 0.3s;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-4px); }
+  75% { transform: translateX(4px); }
+}
+
+.answer-row {
+  display: flex;
+  gap: 8px;
+  margin: 12px 0;
+}
+
+.answer-row input {
+  flex: 1;
+  font: inherit;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--panel-border);
+  background: #0f1424;
+  color: var(--text);
+}
+
+.feedback {
+  font-size: 0.9rem;
+  min-height: 1.2em;
+}
+
+.feedback.wrong { color: var(--danger); }
+.feedback.correct { color: var(--success); }
+
+.hint-text {
+  font-size: 0.85rem;
+  color: var(--accent-2);
+  margin-top: 6px;
+}
+
+.solved-banner {
+  color: var(--success);
+  font-weight: 600;
+}
+
+/* ---------- Multi-part puzzles ---------- */
+
+.part-row {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 10px 0;
+}
+
+.part-row label {
+  font-size: 0.85rem;
+  color: var(--text-dim);
+}
+
+.part-row input {
+  font: inherit;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--panel-border);
+  background: #0f1424;
+  color: var(--text);
+}
+
+.part-row.correct input {
+  border-color: var(--success);
+  background: rgba(110, 255, 176, 0.08);
+}
+
+.part-row.wrong input {
+  border-color: var(--danger);
+}
+
+/* ---------- Level select ---------- */
+
+.level-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.level-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 20px 12px;
+  background: #1c2540;
+  border: 1px solid var(--panel-border);
+  color: var(--text);
+  font-weight: 600;
+}
+
+.level-btn:hover {
+  border-color: var(--accent);
+}
+
+.level-btn-label {
+  font-size: 1.05rem;
+}
+
+#screen-intro .card > button {
+  margin-right: 10px;
+}
+
+/* ---------- Inventory / final door ---------- */
+
+.inventory {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.chip {
+  background: #1c2540;
+  border: 1px solid var(--panel-border);
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-family: monospace;
+  letter-spacing: 2px;
+}
+
+/* ---------- Win scene ---------- */
+
+.win-scene {
+  width: 100%;
+  aspect-ratio: 8 / 4;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.win-scene-svg { width: 100%; height: 100%; display: block; }
+
+footer {
+  text-align: center;
+  color: var(--text-dim);
+  font-size: 0.8rem;
+  padding: 10px;
+}
+
+.footer-link {
+  color: var(--text-dim);
+  margin-left: 8px;
+}
+
+.footer-link:hover {
+  color: var(--accent);
+}
+
+/* ---------- Account bar ---------- */
+
+.user-bar {
+  width: 100%;
+  max-width: 820px;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 10px;
+  padding: 0 20px;
+  font-size: 0.85rem;
+}
+
+.user-bar .secondary {
+  padding: 6px 12px;
+  font-size: 0.8rem;
+}
+
+#screen-signin .card > button {
+  margin-top: 6px;
+}
+
+/* ---------- Results dashboard ---------- */
+
+.dash-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.dash-table th,
+.dash-table td {
+  text-align: left;
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--panel-border);
+  white-space: nowrap;
+}
+
+.dash-table th {
+  color: var(--text-dim);
+  font-weight: 600;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+@media (max-width: 480px) {
+  .level-grid { grid-template-columns: 1fr; }
+}

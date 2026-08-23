@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Physics Lab Lockdown</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Lora:wght@500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header>
+    <h1 id="game-title">Quarry Lane School</h1>
+    <div id="stopwatch">00:00</div>
+  </header>
+  <div class="user-bar" id="user-bar" style="display:none">
+    <span class="dim" id="user-email"></span>
+    <button class="secondary" id="btn-sign-out">Sign out</button>
+  </div>
+
+  <main>
+    <!-- SIGN IN -->
+    <section id="screen-signin" class="screen">
+      <div class="card landing-card">
+        <p class="school-badge">Quarry Lane School</p>
+        <h1 class="landing-title">Physics Lab Lockdown</h1>
+        <p class="landing-about">
+          Sign in with your Quarry Lane School Google account to play. This is just so your time and
+          code can be tracked. Only your first attempt at each level counts, so make it count.
+        </p>
+        <button id="btn-google-signin">Sign in with Google</button>
+        <p class="feedback wrong" id="signin-error" style="display:none"></p>
+      </div>
+    </section>
+
+    <!-- LEVEL SELECT / LANDING -->
+    <section id="screen-level" class="screen">
+      <div class="card landing-card">
+        <p class="school-badge">Quarry Lane School</p>
+        <h1 class="landing-title">Physics Lab Lockdown</h1>
+        <p class="landing-about">
+          Hey! I made this because physics is actually pretty fun once it's not just a test you have
+          to pass. It's an escape room. The clues are hidden on real objects around school, and the
+          questions are stuff you're already learning in class.
+        </p>
+        <p class="landing-about">
+          The point isn't just to escape. It's to notice physics popping up somewhere you didn't expect.
+        </p>
+
+        <div class="landing-encourage">
+          <p class="landing-encourage-title">Before you jump in</p>
+          <p>
+            Try to get through all four levels if you can. Start wherever feels right, but give each
+            question a real shot first. Think it through, write some stuff down, argue about it with a
+            friend, or ask a parent who swears they remember this stuff. The hint isn't going anywhere,
+            so save it for after you've actually tried. Figuring it out yourself is the fun part.
+          </p>
+        </div>
+
+        <h2>Choose your difficulty</h2>
+        <p class="dim">Pick a track to start this month's station. More stations unlock in the coming months.</p>
+        <div class="level-grid" id="level-grid"></div>
+      </div>
+    </section>
+
+    <!-- INTRO -->
+    <section id="screen-intro" class="screen">
+      <div class="card">
+        <h2 id="intro-title"></h2>
+        <p class="dim" id="intro-text"></p>
+        <button id="btn-start">Start</button>
+        <button id="btn-change-level" class="secondary">Choose a different level</button>
+      </div>
+    </section>
+
+    <!-- ROOM (illustrated scene) -->
+    <section id="screen-room" class="screen">
+      <div class="scene-wrap">
+        <div class="back-row">
+          <button id="btn-back-to-levels" class="secondary">← Back to levels</button>
+        </div>
+        <div class="scene-header">
+          <div class="scene-icon-badge" id="room-icon"></div>
+          <div>
+            <h2 id="room-title"></h2>
+            <p class="dim" id="room-intro"></p>
+          </div>
+          <div class="found-counter" id="found-counter"></div>
+        </div>
+        <div class="scene" id="scene-container"></div>
+        <p class="scene-hint dim" id="scene-hint">Click objects in the room to investigate them.</p>
+        <div class="continue-row" id="continue-row" style="display:none">
+          <button id="btn-next-room">Escape!</button>
+        </div>
+      </div>
+
+      <div class="puzzle-panel" id="puzzle-panel" style="display:none">
+        <div class="panel-header">
+          <span class="panel-icon" id="panel-icon"></span>
+          <span class="panel-label" id="panel-label"></span>
+          <button class="panel-close" id="panel-close" aria-label="Close">&times;</button>
+        </div>
+        <div class="panel-body" id="panel-body"></div>
+      </div>
+    </section>
+
+    <!-- WIN -->
+    <section id="screen-win" class="screen">
+      <div class="card">
+        <div class="win-scene" id="win-scene-container"></div>
+        <h2 style="margin-top:16px">🎉 You escaped!</h2>
+        <p class="dim">Final time: <strong id="win-time"></strong></p>
+        <button id="btn-restart" class="secondary">Play again</button>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    Physics Lab Lockdown, built for Quarry Lane schoolmates
+    <a href="dashboard.html" class="footer-link">Results dashboard</a>
+  </footer>
+
+  <script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore-compat.js"></script>
+  <script src="firebase-config.js"></script>
+  <script src="auth.js"></script>
+  <script src="content.js"></script>
+  <script src="game-engine.js"></script>
+</body>
+</html>

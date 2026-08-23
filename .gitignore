@@ -1,0 +1,7 @@
+.DS_Store
+.claude/
+
+# Raw source photos, not for publishing (copyright/privacy). Only the
+# processed assets in art/ (sketches.js, bg-*.jpg) are used by the game.
+/photos/
+/backgounds/
