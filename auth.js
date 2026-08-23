@@ -1,7 +1,7 @@
 /*
   AUTH / RESULT TRACKING
   -----------------------
-  Wraps Firebase Authentication (Google sign-in, restricted to ALLOWED_DOMAIN
+  Wraps Firebase Authentication (Google sign-in, restricted to ALLOWED_DOMAINS
   from firebase-config.js) and Firestore (storing each student's first-ever
   result per level). Exposes a small `Auth` object on window that both
   game-engine.js and dashboard.js use.
@@ -26,9 +26,14 @@
     listeners.forEach((cb) => cb(currentUser));
   }
 
+  function isAllowedDomain(email) {
+    const lower = email.toLowerCase();
+    return ALLOWED_DOMAINS.some((domain) => lower.endsWith("@" + domain.toLowerCase()));
+  }
+
   auth.onAuthStateChanged((user) => {
     resolved = true;
-    if (user && user.email && user.email.toLowerCase().endsWith("@" + ALLOWED_DOMAIN.toLowerCase())) {
+    if (user && user.email && isAllowedDomain(user.email)) {
       currentUser = user;
     } else {
       if (user) {
@@ -47,7 +52,10 @@
 
   function signIn() {
     const provider = new firebase.auth.GoogleAuthProvider();
-    provider.setCustomParameters({ hd: ALLOWED_DOMAIN });
+    // "*" hints Google to prefer a Workspace account over a personal Gmail
+    // in the picker. It can't restrict to two specific domains at once, so
+    // the real enforcement is isAllowedDomain() above, after sign-in.
+    provider.setCustomParameters({ hd: "*" });
     return auth.signInWithPopup(provider);
   }
 

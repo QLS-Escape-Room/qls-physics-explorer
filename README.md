@@ -79,7 +79,7 @@ Firebase project).
             request.auth.token.email in ["aarav.agarwal@quarrylane.org"]);
 
          allow create: if request.auth != null &&
-           request.auth.token.email.matches('.*@quarrylane[.]org$') &&
+           request.auth.token.email.matches('.*@(quarrylane[.]org|student[.]quarrylane[.]org)$') &&
            request.resource.data.uid == request.auth.uid &&
            attemptId == request.auth.uid + '_' + request.resource.data.levelKey &&
            !exists(/databases/$(database)/documents/attempts/$(attemptId));

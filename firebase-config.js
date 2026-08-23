@@ -16,8 +16,9 @@ const FIREBASE_CONFIG = {
   appId: "1:1017277925682:web:f3a7661725691f8291af2b",
 };
 
-// Only Google accounts on this domain are allowed to sign in and play.
-const ALLOWED_DOMAIN = "quarrylane.org";
+// Only Google accounts on these domains are allowed to sign in and play.
+// Students and staff apparently use different subdomains, so both are listed.
+const ALLOWED_DOMAINS = ["quarrylane.org", "student.quarrylane.org"];
 
 // Emails that can view the results dashboard (dashboard.html). Add your own
 // school email here. This list is also just for the dashboard page's own
