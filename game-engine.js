@@ -129,9 +129,26 @@
     LEVEL_META.forEach((meta) => {
       const btn = document.createElement("button");
       btn.className = "level-btn";
+      btn.dataset.levelKey = meta.key;
       btn.innerHTML = `<span class="level-btn-label">${meta.label}</span>`;
       btn.addEventListener("click", () => selectLevel(meta.key));
       grid.appendChild(btn);
+    });
+
+    // Mark levels this player has already completed. Fetched fresh every
+    // time the level-select screen renders, so it stays current right after
+    // finishing a level.
+    Auth.getCompletedLevels().then((completedKeys) => {
+      completedKeys.forEach((key) => {
+        const btn = grid.querySelector(`[data-level-key="${key}"]`);
+        if (btn && !btn.querySelector(".level-check")) {
+          const check = document.createElement("span");
+          check.className = "level-check";
+          check.textContent = "✓";
+          check.setAttribute("aria-label", "Completed");
+          btn.appendChild(check);
+        }
+      });
     });
   }
 
@@ -665,6 +682,7 @@
     clearInterval(state.timerHandle);
     document.getElementById("stopwatch").textContent = "00:00";
     document.getElementById("game-title").textContent = "Quarry Lane School";
+    renderLevelSelect();
     showScreen("level");
   }
   document.getElementById("btn-change-level").addEventListener("click", goToLevelSelect);
@@ -697,6 +715,7 @@
     if (user) {
       userBar.style.display = "flex";
       document.getElementById("user-email").textContent = user.email;
+      renderLevelSelect();
       showScreen("level");
     } else {
       userBar.style.display = "none";

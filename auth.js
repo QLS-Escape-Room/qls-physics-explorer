@@ -104,6 +104,19 @@
       });
   }
 
+  function getCompletedLevels() {
+    if (!currentUser) return Promise.resolve([]);
+    return db
+      .collection("attempts")
+      .where("uid", "==", currentUser.uid)
+      .get()
+      .then((snap) => snap.docs.map((doc) => doc.data().levelKey))
+      .catch((err) => {
+        console.warn("Could not load completed levels:", err.code, err.message);
+        return [];
+      });
+  }
+
   window.Auth = {
     onAuthChange,
     signIn,
@@ -111,5 +124,6 @@
     currentUser: getCurrentUser,
     isAdmin,
     recordResult,
+    getCompletedLevels,
   };
 })();

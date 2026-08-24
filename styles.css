@@ -521,6 +521,7 @@ button:disabled { opacity: 0.4; cursor: not-allowed; }
 }
 
 .level-btn {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -530,6 +531,16 @@ button:disabled { opacity: 0.4; cursor: not-allowed; }
   border: 1px solid var(--panel-border);
   color: var(--text);
   font-weight: 600;
+}
+
+.level-check {
+  position: absolute;
+  top: 8px;
+  right: 10px;
+  color: var(--success);
+  font-weight: 700;
+  font-size: 1rem;
+  line-height: 1;
 }
 
 .level-btn:hover {
