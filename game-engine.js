@@ -656,15 +656,6 @@
     document.getElementById("win-scene-container").innerHTML = buildWinSceneSVG();
   }
 
-  function restart() {
-    state.roomIndex = 0;
-    state.solved.clear();
-    state.collectedFragments = [];
-    state.activePuzzleId = null;
-    document.getElementById("stopwatch").textContent = "00:00";
-    showScreen("intro");
-  }
-
   document.getElementById("btn-start").addEventListener("click", () => {
     startStopwatch();
     showScreen("room");
@@ -678,7 +669,7 @@
   }
   document.getElementById("btn-change-level").addEventListener("click", goToLevelSelect);
   document.getElementById("btn-back-to-levels").addEventListener("click", goToLevelSelect);
-  document.getElementById("btn-restart").addEventListener("click", restart);
+  document.getElementById("btn-restart").addEventListener("click", goToLevelSelect);
 
   // ---------- Sign-in gate ----------
 
