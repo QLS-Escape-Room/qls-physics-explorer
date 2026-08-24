@@ -24,4 +24,9 @@ const ALLOWED_DOMAINS = ["quarrylane.org", "student.quarrylane.org"];
 // school email here. This list is also just for the dashboard page's own
 // UI check, the REAL access control lives in Firestore's security rules
 // (see README), so keep both in sync when you add or remove someone.
-const ADMIN_EMAILS = ["qlsescaperoom@gmail.com"];
+const ADMIN_EMAILS = [
+  "qlsescaperoom@gmail.com",
+  "aagarwal77@gmail.com",
+  "mitalyp@gmail.com",
+  "aaravpagarwal@gmail.com",
+];
