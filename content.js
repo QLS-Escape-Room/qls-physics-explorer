@@ -40,7 +40,7 @@ const LEVEL_META = [
 const LEVELS = {
   // ---------------------------------------------------------------
   regular: {
-    title: "Physics Lab Lockdown, Level 1",
+    title: "Physics Explorer, Level 1",
     intro:
       "You stayed after class to finish a project and got locked in the physics lab. " +
       "The exit door has a keypad lock. Clear this station to collect the code " +
@@ -104,7 +104,7 @@ const LEVELS = {
 
   // ---------------------------------------------------------------
   ap1: {
-    title: "Physics Lab Lockdown, Level 2",
+    title: "Physics Explorer, Level 2",
     intro:
       "You stayed after class to finish some review and got locked in the school office. " +
       "The exit door has a keypad lock. Clear this station to collect the code " +
@@ -168,7 +168,7 @@ const LEVELS = {
 
   // ---------------------------------------------------------------
   apc: {
-    title: "Physics Lab Lockdown, Level 3",
+    title: "Physics Explorer, Level 3",
     intro:
       "You stayed after class to finish some review and got locked in the music room. " +
       "The exit door has a keypad lock. Clear this station to collect the code " +
@@ -232,7 +232,7 @@ const LEVELS = {
 
   // ---------------------------------------------------------------
   ib: {
-    title: "Physics Lab Lockdown, Level 4",
+    title: "Physics Explorer, Level 4",
     intro:
       "You stayed after a late robotics build night and got locked in the team's parking lot. " +
       "The exit door has a keypad lock. Clear this station to collect the code " +

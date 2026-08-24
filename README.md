@@ -1,4 +1,4 @@
-# Physics Lab Lockdown
+# Physics Explorer
 
 A browser-based physics escape room. No install, open `index.html` or host it as a static site. Sign-in
 and result tracking use Firebase (Google's free hosted backend), so there's still no server for you to
@@ -111,7 +111,7 @@ Just double-click `index.html` to open it in a browser. No server required.
 ```bash
 git init
 git add .
-git commit -m "Physics Lab Lockdown escape room"
+git commit -m "Physics Explorer escape room"
 ```
 
 Then create a new repo on GitHub (e.g. `physics-escape-room`) and push:
