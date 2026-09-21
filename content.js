@@ -431,7 +431,7 @@ const LEVELS = {
 };
 
 // Equations shown as scattered notes in the room when the player turns on
-// "Show equations" on the home page. Keyed by puzzle id. Repeats within a room
+// "Extra clues" on the home page. Keyed by puzzle id. Repeats within a room
 // are collapsed into a single note.
 const EQUATIONS = {
   // Level 1

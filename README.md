@@ -40,7 +40,7 @@ Each level is its own story in one room, with five clues solved in order. Every 
 clue's `reveal.give` supplies the value (see the notes at the top of `content.js`). The `contribution`
 characters are the code letters (Levels 1 and 4) or the piano notes (Level 3). They only show inside the clue itself, so players reread their clues and put the code together on their own.
 
-The "Show equations" switch on the home page adds a control to the room (a light switch in the gym and music
+The "Extra clues" switch on the home page adds a control to the room (a light switch in the gym and music
 room, a clickable sun that turns into a moon at the office and tech lot). With it flipped to dark, each level's equations glow on
 the walls, floors and ceilings. The lists they sit in are set by `eqBlocks` in `game-engine.js`, and the equations
 themselves live in the `EQUATIONS` object in `content.js`, keyed by puzzle id (`_0` and `_{out}` make subscripts). Whether it was on is saved with
