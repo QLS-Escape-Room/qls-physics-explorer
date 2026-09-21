@@ -61,6 +61,7 @@
             `<td>${escapeHtml(d.levelLabel || d.levelKey)}</td>` +
             `<td>${escapeHtml(d.timeText)}</td>` +
             `<td>${escapeHtml(d.code)}</td>` +
+            `<td>${d.equationsOn === true ? "On" : d.equationsOn === false ? "Off" : ""}</td>` +
             `<td>${escapeHtml(when)}</td>`;
           tbody.appendChild(tr);
         });

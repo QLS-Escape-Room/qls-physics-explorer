@@ -78,7 +78,7 @@
     return !!user && ADMIN_EMAILS.includes(user.email);
   }
 
-  function recordResult(levelKey, levelLabel, timeText, code) {
+  function recordResult(levelKey, levelLabel, timeText, code, equationsOn) {
     if (!currentUser) return Promise.resolve();
     const docId = `${currentUser.uid}_${levelKey}`;
     return db
@@ -92,6 +92,7 @@
         levelLabel,
         timeText,
         code,
+        equationsOn: !!equationsOn,
         solvedAt: firebase.firestore.FieldValue.serverTimestamp(),
       })
       .catch((err) => {

@@ -26,13 +26,25 @@ Open `content.js`. Each room has a `puzzles` array. Copy an existing puzzle bloc
 - `prompt`: the question text
 - `options`: only for `mcq`, list of choices
 - `answer`: the correct choice (mcq), correct number (numeric), or correct word (text)
-- `tolerance`: only for `numeric`, how much rounding error to allow (e.g. `0.5`)
 - `hint`: optional hint text
 - `contribution`: a short string (usually 1 letter) awarded when solved
 
 All `contribution`s across all rooms, in order, form the final door code, this is computed automatically, you don't need to manage it.
 
 You can add more puzzles to a room, add more rooms (copy a room block), or change the theme/title/intro text at the top of the file.
+
+## Stories, clue order and equations
+
+Each level is its own story in one room, with five clues solved in order. Every clue after the first has a
+`{{name}}` placeholder in its `prompt` that shows as `???` until the clue before it is solved. That earlier
+clue's `reveal.give` supplies the value (see the notes at the top of `content.js`). The `contribution`
+characters are the code letters (Levels 1 and 4) or the piano notes (Level 3). They only show inside the clue itself, so players reread their clues and put the code together on their own.
+
+The "Show equations" switch on the home page adds a control to the room (a light switch in the gym and music
+room, a clickable sun that turns into a moon at the office and tech lot). With it flipped to dark, each level's equations glow on
+the walls, floors and ceilings. The lists they sit in are set by `eqBlocks` in `game-engine.js`, and the equations
+themselves live in the `EQUATIONS` object in `content.js`, keyed by puzzle id (`_0` and `_{out}` make subscripts). Whether it was on is saved with
+the result (`equationsOn`) and shown on the dashboard.
 
 ## Setting up Google sign-in and result tracking
 

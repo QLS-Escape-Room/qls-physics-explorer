@@ -58,8 +58,17 @@
           </p>
         </div>
 
+        <label class="eq-toggle" for="toggle-equations">
+          <input type="checkbox" id="toggle-equations" role="switch" />
+          <span class="eq-toggle-track" aria-hidden="true"></span>
+          <span class="eq-toggle-text">
+            <strong>Extra clues</strong>
+            <span class="dim">Turn this on for extra clues. It's saved with your result.</span>
+          </span>
+        </label>
+
         <h2>Choose your difficulty</h2>
-        <p class="dim">Pick a track to start this month's station. More stations unlock in the coming months.</p>
+        <p class="dim">Pick a level. Each one is its own story, set somewhere different on campus.</p>
         <div class="level-grid" id="level-grid"></div>
       </div>
     </section>
@@ -68,6 +77,7 @@
     <section id="screen-intro" class="screen">
       <div class="card">
         <h2 id="intro-title"></h2>
+        <p class="story-kicker" id="intro-story"></p>
         <p class="dim" id="intro-text"></p>
         <button id="btn-start">Start</button>
         <button id="btn-change-level" class="secondary">Choose a different level</button>
@@ -90,9 +100,8 @@
         </div>
         <div class="scene" id="scene-container"></div>
         <p class="scene-hint dim" id="scene-hint">Click objects in the room to investigate them.</p>
-        <div class="continue-row" id="continue-row" style="display:none">
-          <button id="btn-next-room">Escape!</button>
-        </div>
+        <p class="collected-strip" id="collected-strip" style="display:none"></p>
+        <div class="clue-notebook" id="clue-notebook" style="display:none"></div>
       </div>
 
       <div class="puzzle-panel" id="puzzle-panel" style="display:none">
@@ -109,7 +118,8 @@
     <section id="screen-win" class="screen">
       <div class="card">
         <div class="win-scene" id="win-scene-container"></div>
-        <h2 style="margin-top:16px">🎉 You escaped!</h2>
+        <h2 style="margin-top:16px" id="win-title">🎉 You escaped!</h2>
+        <p class="dim" id="win-text"></p>
         <p class="dim">Final time: <strong id="win-time"></strong></p>
         <button id="btn-restart" class="secondary">Choose a different level</button>
       </div>
