@@ -1,6 +1,7 @@
 (function () {
   const state = {
     levelKey: null,
+    setId: null, // which set the level-select screen is showing (starts on the newest)
     roomIndex: 0,
     solved: new Set(), // puzzle ids solved
     cards: [], // clue cards handed out by solved clues: { name, value, label, from }
@@ -14,19 +15,227 @@
     activePuzzleId: null,
   };
 
-  let activeLevel = null; // LEVELS[state.levelKey]
-  let activeScenes = null; // SCENES[state.levelKey]
+  let activeLevel = null; // ALL_LEVELS[state.levelKey]
+  let activeScenes = null; // ALL_SCENES[state.levelKey]
 
-  // Each level's single room: background photo, how the player gets out (the
-  // `exit`), and where the five puzzle props sit on real objects in the photo.
-  // Props are in story order, prop N goes with puzzle N. Coordinates are in the
-  // photo's own pixel space (all bg images are 1100x825).
+  // Each level is two scenes in a row: a hallway, then the room it leads into.
+  // Photos are real (temporary) campus photos, one prop per puzzle in that
+  // room, in story order (prop N goes with puzzle N). Coordinates are in each
+  // photo's own pixel space, all sized to 1100px wide.
   //
   // exit.mode:
-  //   "code"    -> solve every clue, then type the code you assembled from them
-  //   "key"     -> solve every clue, then find the key, then click the door
-  //   "melody"  -> solve every clue, then play the five notes from the clues on the piano
-  const SCENES = {
+  //   "continue" -> the hallway's own exit, just walks into the next room
+  //   "code"     -> solve every clue, then type the code you assembled from them
+  //   "key"      -> solve every clue, then find the key, then click the door
+  //   "melody"   -> solve every clue, then play the five notes from the clues on the piano
+  const SCENES_V2 = {
+    regular: [
+      {
+        // The Hallway: open double doors onto a locker-lined hall
+        bgImage: "art/bg-lockers-hall.jpg",
+        bgSize: { w: 1100, h: 825 },
+        glow: "#f2b134",
+        lights: { kind: "lights", cx: 300, cy: 690 },
+        eqBlocks: [{ x: 185, y: 470, w: 230, h: 130, cols: 1 }],
+        exit: {
+          art: "door",
+          mode: "continue",
+          cx: 600,
+          cy: 590,
+          r: 60,
+          lockedIcon: "🔒",
+          unlockedIcon: "👉",
+          label: "Classroom door",
+          lockedMsg: "🔒 Solve both hallway clues first.",
+          readyMsg: "Head back through the door into the classroom!",
+        },
+        props: [
+          { type: "marker", cx: 655, cy: 385, size: 130, label: "Row of lockers", icon: "🔐" },
+          { type: "marker", cx: 295, cy: 290, size: 150, label: "Classroom door window", icon: "🪟" },
+        ],
+      },
+      {
+        // The Harkness Room: bookshelf, oval table, AC unit, keypad on the far door
+        bgImage: "art/bg-harkness.jpg",
+        bgSize: { w: 1100, h: 825 },
+        glow: "#f2b134",
+        lights: { kind: "lights", cx: 235, cy: 335 },
+        eqBlocks: [{ x: 30, y: 130, w: 230, h: 130, cols: 1 }],
+        back: { cx: 1010, cy: 690, r: 50, icon: "↩️", label: "Back to the hallway" },
+        exit: {
+          art: "trailerLock",
+          mode: "code",
+          rect: { x: 955, y: 250, w: 110, h: 70 },
+          codeLabel: "Door keypad",
+          codePrompt: "The keypad wants five digits. Use the ones from the clues, in the order you found them.",
+          lockedMsg: "🔒 The keypad needs a code. Solve every clue to get all five digits.",
+          readyMsg: "All five digits found. Click the keypad on the door and enter the code!",
+        },
+        props: [
+          { type: "marker", cx: 190, cy: 475, size: 150, label: "Bookshelf", icon: "📚" },
+          { type: "marker", cx: 560, cy: 640, size: 200, label: "Oval conference table", icon: "🪑" },
+          { type: "marker", cx: 417, cy: 330, size: 110, label: "AC unit control panel", icon: "❄️" },
+        ],
+      },
+    ],
+    ap1: [
+      {
+        // The Catwalk: track lights, windows onto the gym, a lounge table
+        bgImage: "art/bg-catwalk-hall.jpg",
+        bgSize: { w: 1100, h: 825 },
+        glow: "#5ee1c9",
+        lights: { kind: "lights", cx: 120, cy: 610 },
+        eqBlocks: [{ x: 60, y: 440, w: 290, h: 126, cols: 1 }],
+        exit: {
+          art: "door",
+          mode: "continue",
+          cx: 975,
+          cy: 365,
+          r: 45,
+          lockedIcon: "🔒",
+          unlockedIcon: "👉",
+          label: "Down the Catwalk",
+          lockedMsg: "🔒 Solve both hallway clues first.",
+          readyMsg: "Head further down the Catwalk to the trophy alcove!",
+        },
+        props: [
+          { type: "marker", cx: 825, cy: 90, size: 110, label: "Track lights", icon: "💡" },
+          { type: "marker", cx: 400, cy: 235, size: 210, label: "Windows onto the gym", icon: "🪟" },
+        ],
+      },
+      {
+        // The Trophy Alcove: windows, armchairs, the locked trophy case (key hidden nearby)
+        bgImage: "art/bg-trophy.jpg",
+        bgSize: { w: 1100, h: 825 },
+        glow: "#5ee1c9",
+        extraHidden: true, // objects here start with no idle glow at all, hover only
+        lights: { kind: "lights", cx: 437, cy: 145 },
+        eqBlocks: [{ x: 330, y: 665, w: 480, h: 126, cols: 1 }],
+        back: { cx: 1010, cy: 730, r: 50, icon: "↩️", label: "Back to the Catwalk" },
+        exit: {
+          art: "door",
+          mode: "key",
+          cx: 590,
+          cy: 480,
+          r: 55,
+          lockedIcon: "🔒",
+          unlockedIcon: "🔓",
+          label: "Trophy case",
+          lockedMsg: "🔒 The case is locked. Solve every clue to have a shot at finding the key.",
+          keyMsg: "The key is hiding somewhere around the case. Look for a glint!",
+          readyMsg: "You have the key. Click the case!",
+        },
+        keySpot: { cx: 430, cy: 545, size: 70 },
+        props: [
+          { type: "marker", cx: 195, cy: 285, size: 200, label: "Windows onto the gym", icon: "🪟" },
+          { type: "marker", cx: 860, cy: 540, size: 150, label: "Blue armchair", icon: "💺" },
+          { type: "marker", cx: 590, cy: 310, size: 120, label: "Top shelf of the trophy case", icon: "🏆" },
+        ],
+      },
+    ],
+    apc: [
+      {
+        // The Gym Foyer: a ceiling vent, a foosball table, a long hallway of benches
+        bgImage: "art/bg-gymfoyer-hall.jpg",
+        bgSize: { w: 1100, h: 825 },
+        glow: "#7ecbff",
+        lights: { kind: "lights", cx: 960, cy: 150 },
+        eqBlocks: [{ x: 780, y: 330, w: 290, h: 84, cols: 1 }],
+        exit: {
+          art: "door",
+          mode: "continue",
+          cx: 538,
+          cy: 370,
+          r: 50,
+          lockedIcon: "🔒",
+          unlockedIcon: "👉",
+          label: "Into the game area",
+          lockedMsg: "🔒 Solve both hallway clues first.",
+          readyMsg: "Head into the game area where the door lock is!",
+        },
+        props: [
+          { type: "marker", cx: 505, cy: 95, size: 90, label: "Ceiling air vent", icon: "💨" },
+          { type: "marker", cx: 340, cy: 425, size: 140, label: "Foosball table", icon: "⚽" },
+        ],
+      },
+      {
+        // The Game Area: two sets of glass doors, a ping-pong table, the glitched door lock
+        bgImage: "art/bg-pingpong.jpg",
+        bgSize: { w: 1100, h: 825 },
+        glow: "#7ecbff",
+        lights: { kind: "lights", cx: 815, cy: 190 },
+        eqBlocks: [{ x: 60, y: 645, w: 380, h: 130, cols: 1 }],
+        back: { cx: 580, cy: 700, r: 50, icon: "↩️", label: "Back to the Gym Foyer" },
+        exit: {
+          art: "trailerLock",
+          mode: "code",
+          rect: { x: 760, y: 330, w: 110, h: 70 },
+          codeLabel: "Door lock override",
+          codePrompt: "The lock wants five characters. Use the ones from the clues, in the order you found them.",
+          lockedMsg: "🔒 The lock needs an override code. Solve every clue to get every character.",
+          readyMsg: "Every clue solved. Click the lock and enter the override!",
+        },
+        props: [
+          { type: "marker", cx: 300, cy: 430, size: 160, label: "Entrance door", icon: "🚪" },
+          { type: "marker", cx: 930, cy: 700, size: 190, label: "Ping-pong table", icon: "🏓" },
+          { type: "marker", cx: 620, cy: 420, size: 130, label: "Second set of doors", icon: "🔌" },
+        ],
+      },
+    ],
+    ib: [
+      {
+        // The Safe Zone Hallway: a long hall with red floor tiles and heavy doors
+        bgImage: "art/bg-stripe-hall.jpg",
+        bgSize: { w: 1100, h: 825 },
+        glow: "#c9a6ff",
+        lights: { kind: "lights", cx: 620, cy: 330 },
+        eqBlocks: [{ x: 700, y: 540, w: 390, h: 130, cols: 2 }],
+        exit: {
+          art: "door",
+          mode: "continue",
+          cx: 135,
+          cy: 420,
+          r: 55,
+          lockedIcon: "🔒",
+          unlockedIcon: "👉",
+          label: "Into the lab",
+          lockedMsg: "🔒 Solve both hallway clues first.",
+          readyMsg: "Head into the Fabrication Lab!",
+        },
+        props: [
+          { type: "marker", cx: 390, cy: 650, size: 150, label: "Red-striped floor", icon: "☣️" },
+          { type: "marker", cx: 770, cy: 300, size: 150, label: "Narrow door window", icon: "🪟" },
+        ],
+      },
+      {
+        // The Fabrication Lab: 3D printer bench, tool caddy, robot arm, the locked inner door
+        bgImage: "art/bg-fablab.jpg",
+        bgSize: { w: 1100, h: 825 },
+        glow: "#c9a6ff",
+        lights: { kind: "lights", cx: 1000, cy: 150 },
+        eqBlocks: [{ x: 300, y: 535, w: 540, h: 170, cols: 2 }],
+        back: { cx: 560, cy: 770, r: 45, icon: "↩️", label: "Back to the hallway" },
+        exit: {
+          art: "trailerLock",
+          mode: "code",
+          rect: { x: 640, y: 250, w: 110, h: 70 },
+          codeLabel: "Lab door override",
+          codePrompt: "The lock wants five characters. Use the ones from the checklist, in the order you found them.",
+          lockedMsg: "🔒 The inner door needs a code. Finish the whole checklist to get every character.",
+          readyMsg: "The checklist is done. Click the door and enter the code!",
+        },
+        props: [
+          { type: "marker", cx: 920, cy: 400, size: 200, label: "3D printer bench", icon: "🖨️" },
+          { type: "marker", cx: 305, cy: 392, size: 110, label: "Tool caddy", icon: "🧰" },
+          { type: "marker", cx: 525, cy: 310, size: 90, label: "Robot arm", icon: "🦾" },
+        ],
+      },
+    ],
+  };
+  // V1 (the original levels): one room per level, no hallway. Coordinates are in
+  // the photo's own pixel space (all bg images are 1100x825). Same exit modes as
+  // V2 below except there is no "continue" and no `back`.
+  const SCENES_V1 = {
     regular: [
       {
         // The Gym: equipment cage with a letter lock
@@ -159,6 +368,44 @@
     ],
   };
 
+  // ---------- Level sets (V1 and V2) ----------
+  // Both sets play through the same engine. V1 keeps its original level keys,
+  // so existing results and checkmarks are untouched. V2 keys get a "v2_"
+  // prefix so the two sets never share a saved result.
+  const LEVEL_SETS = [
+    {
+      id: "v1",
+      label: "V1",
+      tagline: "The original levels",
+      blurb: "One room per level. Photos of campus, five clues each.",
+      prefix: "",
+      meta: LEVEL_META_V1,
+      levels: LEVELS_V1,
+      scenes: SCENES_V1,
+    },
+    {
+      id: "v2",
+      label: "V2",
+      tagline: "The new levels",
+      blurb: "A hallway and a room per level, with illustrated scenes. You can walk back and forth between them.",
+      prefix: "v2_",
+      meta: LEVEL_META_V2,
+      levels: LEVELS_V2,
+      scenes: SCENES_V2,
+    },
+  ];
+  const ALL_META = [];
+  const ALL_LEVELS = {};
+  const ALL_SCENES = {};
+  LEVEL_SETS.forEach((set) => {
+    set.meta.forEach((m) => {
+      const key = set.prefix + m.key;
+      ALL_META.push({ ...m, key, setId: set.id, setLabel: set.label });
+      ALL_LEVELS[key] = set.levels[m.key];
+      ALL_SCENES[key] = set.scenes[m.key];
+    });
+  });
+
   const PROP_SOLVE_ANIM = {
     basketball: "prop-anim-basketball",
     envelope: "prop-anim-envelope",
@@ -199,10 +446,51 @@
 
   // ---------- Level select ----------
 
+  // The newest set (last in LEVEL_SETS) is what opens by default. Older sets
+  // are reachable from a small dropdown, newest first.
+  const LATEST_SET = LEVEL_SETS[LEVEL_SETS.length - 1];
+  state.setId = LATEST_SET.id;
+
+  let completedKeys = [];
+
+  function renderSetPicker() {
+    const select = document.getElementById("set-select");
+    select.innerHTML = "";
+    LEVEL_SETS.slice()
+      .reverse()
+      .forEach((set) => {
+        const done = set.meta.filter((m) => completedKeys.includes(set.prefix + m.key)).length;
+        const opt = document.createElement("option");
+        opt.value = set.id;
+        opt.textContent =
+          `${set.label}${set === LATEST_SET ? " (latest)" : ""}, ${set.tagline.toLowerCase()}, ` +
+          `${done} / ${set.meta.length} done`;
+        select.appendChild(opt);
+      });
+    select.value = state.setId;
+    const set = LEVEL_SETS.find((s) => s.id === state.setId);
+    document.getElementById("set-blurb").textContent = set.blurb;
+  }
+
+  function markCompletedLevels() {
+    const grid = document.getElementById("level-grid");
+    completedKeys.forEach((key) => {
+      const btn = grid.querySelector(`[data-level-key="${key}"]`);
+      if (btn && !btn.querySelector(".level-check")) {
+        const check = document.createElement("span");
+        check.className = "level-check";
+        check.textContent = "✓";
+        check.setAttribute("aria-label", "Completed");
+        btn.appendChild(check);
+      }
+    });
+  }
+
   function renderLevelSelect() {
+    renderSetPicker();
     const grid = document.getElementById("level-grid");
     grid.innerHTML = "";
-    LEVEL_META.forEach((meta) => {
+    ALL_META.filter((meta) => meta.setId === state.setId).forEach((meta) => {
       const btn = document.createElement("button");
       btn.className = "level-btn";
       btn.dataset.levelKey = meta.key;
@@ -212,28 +500,21 @@
       btn.addEventListener("click", () => selectLevel(meta.key));
       grid.appendChild(btn);
     });
+    markCompletedLevels();
 
-    // Mark levels this player has already completed. Fetched fresh every
-    // time the level-select screen renders, so it stays current right after
-    // finishing a level.
-    Auth.getCompletedLevels().then((completedKeys) => {
-      completedKeys.forEach((key) => {
-        const btn = grid.querySelector(`[data-level-key="${key}"]`);
-        if (btn && !btn.querySelector(".level-check")) {
-          const check = document.createElement("span");
-          check.className = "level-check";
-          check.textContent = "✓";
-          check.setAttribute("aria-label", "Completed");
-          btn.appendChild(check);
-        }
-      });
+    // Checkmarks come from the player's account (their saved results), fetched
+    // fresh every time this screen renders so it's current right after a win.
+    Auth.getCompletedLevels().then((keys) => {
+      completedKeys = keys;
+      renderSetPicker();
+      markCompletedLevels();
     });
   }
 
   function selectLevel(key) {
     state.levelKey = key;
-    activeLevel = LEVELS[key];
-    activeScenes = SCENES[key];
+    activeLevel = ALL_LEVELS[key];
+    activeScenes = ALL_SCENES[key];
     state.roomIndex = 0;
     state.solved.clear();
     state.cards = [];
@@ -519,6 +800,22 @@
     </svg>`;
   }
 
+  // A small, always-usable "walk back to the hallway" hotspot for a room
+  // scene, separate from the level's real exit (the lock/key/melody), so
+  // players can freely go back and forth instead of only moving forward.
+  function buildBackSVG(scene) {
+    if (!scene.back) return "";
+    const { cx, cy, r, icon } = scene.back;
+    return `
+    <svg class="hotspot back-hotspot" data-hotspot="back"
+         x="${cx - r}" y="${cy - r}" width="${r * 2}" height="${r * 2}"
+         viewBox="0 0 100 100" tabindex="0" role="button" aria-label="${scene.back.label}">
+      <circle class="door-hit" cx="50" cy="50" r="48" />
+      <circle class="door-badge" cx="50" cy="50" r="24" />
+      <text x="50" y="60" font-size="26" text-anchor="middle">${icon}</text>
+    </svg>`;
+  }
+
   // ---------- Hidden equations (only visible with the lights off) ----------
 
   const EQ = { fs: 28, charW: 0.47, lineH: 1.5 };
@@ -656,13 +953,14 @@
     // Exit goes under the props so a prop that overlaps it still gets the click.
     return `
     <svg viewBox="0 0 ${w} ${h}" xmlns="http://www.w3.org/2000/svg" class="scene-svg${scene.extraHidden ? " scene-extra-hidden" : ""}${state.lightsOff ? " dark" : ""}">
-      <image class="scene-bg" x="0" y="0" width="${w}" height="${h}" href="${scene.bgImage}" />
+      <image class="scene-bg" x="0" y="0" width="${w}" height="${h}" href="${scene.bgImage}?v=7" />
       <rect class="dark-veil" x="0" y="0" width="${w}" height="${h}" fill="${veil}" />
       ${buildEquationTextSVG()}
       ${buildExitSVG(scene, room)}
       ${propsMarkup}
       ${buildLightSwitchSVG(scene)}
       ${buildKeySVG(scene)}
+      ${buildBackSVG(scene)}
     </svg>`;
   }
 
@@ -731,7 +1029,7 @@
     const allSolved = room.puzzles.every((p) => state.solved.has(p.id));
     const foundCount = room.puzzles.filter((p) => state.solved.has(p.id)).length;
     const isDoor = ex.art === "door";
-    const exitReady = allSolved && (ex.mode !== "key" || state.keyFound);
+    const exitReady = ex.mode === "continue" ? true : allSolved && (ex.mode !== "key" || state.keyFound);
 
     const counter = document.getElementById("found-counter");
     counter.textContent = `${foundCount} / ${room.puzzles.length} found`;
@@ -755,8 +1053,13 @@
     renderClueNotebook();
 
     let hint = "Click objects in the room to investigate them. If a clue is missing a piece, see if one of the clues you've found fits.";
-    if (allSolved) {
+    if (ex.mode === "continue") {
+      hint += ` ${ex.readyMsg}`;
+    } else if (allSolved) {
       hint = ex.mode === "key" && !state.keyFound ? ex.keyMsg : ex.readyMsg;
+    }
+    if (scene.back) {
+      hint += ` You can also head back to ${scene.back.label.replace(/^Back to /i, "")}.`;
     }
     if (state.equationsOn && scene.lights) {
       hint += state.lightsOff
@@ -881,9 +1184,17 @@
     });
   }
 
+  // Huge or tiny numbers show in e format (1.5e20, not 150000000000000000000).
+  function formatNumber(n) {
+    if (typeof n !== "number" || n === 0) return String(n);
+    const abs = Math.abs(n);
+    if (abs >= 1e7 || abs < 1e-4) return n.toExponential().replace("e+", "e");
+    return String(n);
+  }
+
   function formatAnswer(puzzle) {
-    if (puzzle.type === "multipart") return puzzle.parts.map((pt) => `${pt.label}: ${pt.answer}`);
-    return [String(puzzle.answer)];
+    if (puzzle.type === "multipart") return puzzle.parts.map((pt) => `${pt.label}: ${formatNumber(pt.answer)}`);
+    return [formatNumber(puzzle.answer)];
   }
 
   function appendRevealBox(body, puzzle) {
@@ -1083,9 +1394,32 @@
     }
   }
 
+  // Slides the current scene out and the new one in, in the given direction.
+  // The container element itself persists across renderRoom() (only its
+  // innerHTML is replaced), so the animation classes just ride along.
+  function switchScene(toIndex, direction) {
+    if (toIndex === state.roomIndex) return;
+    const container = document.getElementById("scene-container");
+    const leaveClass = direction === "forward" ? "scene-leave-fwd" : "scene-leave-back";
+    const enterClass = direction === "forward" ? "scene-enter-fwd" : "scene-enter-back";
+    container.classList.add(leaveClass);
+    setTimeout(() => {
+      state.roomIndex = toIndex;
+      renderRoom();
+      container.classList.remove(leaveClass);
+      container.classList.add(enterClass);
+      void container.offsetWidth; // force reflow so removing the class below actually transitions
+      container.classList.remove(enterClass);
+    }, 220);
+  }
+
   function handleExitClick() {
     const room = activeLevel.rooms[state.roomIndex];
     const ex = currentScene().exit;
+    if (ex.mode === "continue") {
+      switchScene(state.roomIndex + 1, "forward");
+      return;
+    }
     const allSolved = room.puzzles.every((p) => state.solved.has(p.id));
     if (!allSolved) {
       shakeExit();
@@ -1173,6 +1507,10 @@
   function handleKeyClick() {
     state.keyFound = true;
     updateProgressionUI();
+  }
+
+  function handleBackClick() {
+    switchScene(state.roomIndex - 1, "back");
   }
 
   // ---------- Piano (Level 3's exit) ----------
@@ -1281,10 +1619,10 @@
     document.getElementById("win-time").textContent = finalTime;
     document.getElementById("win-title").textContent = `🎉 ${activeLevel.winTitle}`;
     document.getElementById("win-text").textContent = activeLevel.winText;
-    const meta = LEVEL_META.find((m) => m.key === state.levelKey);
+    const meta = ALL_META.find((m) => m.key === state.levelKey);
     Auth.recordResult(
       state.levelKey,
-      meta ? meta.label : state.levelKey,
+      meta ? `${meta.setLabel} ${meta.label}` : state.levelKey,
       finalTime,
       activeLevel.finalCode,
       state.equationsOn
@@ -1302,6 +1640,8 @@
       handleExitClick();
     } else if (id === "key") {
       handleKeyClick();
+    } else if (id === "back") {
+      handleBackClick();
     } else if (id === "lights") {
       handleLightsClick();
     } else {
@@ -1318,6 +1658,8 @@
       handleExitClick();
     } else if (id === "key") {
       handleKeyClick();
+    } else if (id === "back") {
+      handleBackClick();
     } else if (id === "lights") {
       handleLightsClick();
     } else {
@@ -1430,10 +1772,15 @@
     }
   });
 
+  document.getElementById("set-select").addEventListener("change", (e) => {
+    state.setId = e.target.value;
+    renderLevelSelect();
+  });
   renderLevelSelect();
 
   Auth.onAuthChange((user) => {
     const userBar = document.getElementById("user-bar");
+    completedKeys = []; // never show the previous player's checkmarks
     if (user) {
       userBar.style.display = "flex";
       document.getElementById("user-email").textContent = user.email;
