@@ -6,88 +6,45 @@ run yourself, see "Setting up Google sign-in and result tracking" below.
 
 ## Files
 
-- `content-v1.js` and `content-v2.js`, **all your questions live here.** `content-v1.js` is the original set of
-  levels (V1), `content-v2.js` is the new set (V2). Edit these to change puzzles.
+- `content.js`, **all your questions live here.** Edit this to change puzzles.
 - `index.html`, `styles.css`, `game-engine.js`, the game engine. You shouldn't need to touch these to just change questions.
-  The engine runs every set. Level select opens on the newest version, with a small "Version" dropdown to switch to older ones.
-- `art/bg-*.jpg`, background art. V1 uses `bg-mechanics.jpg`, `bg-circuits.jpg`, `bg-waves.jpg` and `bg-win.jpg`
-  (one per level). V2 uses two per level: a hallway (`*-hall.jpg`) and the room it leads into, all illustrated
-  AI-made art (1100x825 once resized). Don't delete any of them, both sets still need them.
-- `photos/`, `backgounds/`, raw source photos/art. Gitignored, not published, since some are copyrighted or not
-  yours to redistribute and shouldn't ship in a public repo. Safe to delete once you're happy with `art/`.
-- `tools/photo_to_sketch.py`, an optional script that turns a photo into a vector line-art sketch (Canny edge
-  detection, all local, no AI/network). Not currently used by the game, but there if you want that look later.
+- `art/bg-mechanics.jpg`, `art/bg-circuits.jpg`, `art/bg-waves.jpg`, background art (stylized illustrations of the real school) for the three stations. The win screen is a generated graphic (trophy + confetti), not a photo, so it always looks the same regardless of background art. `art/bg-win.jpg` is no longer referenced by the game and can be deleted if you don't want it kept around.
+- `photos/`, `backgounds/`, raw source photos/art used to produce the images above. Gitignored, not published, since some are copyrighted or not yours to redistribute and shouldn't ship in a public repo. Safe to delete once you're happy with the generated art in `art/`.
+- `tools/photo_to_sketch.py`, an optional script that turns a photo into a vector line-art sketch (Canny edge detection, all local, no AI/network). Not currently used by the game, but there if you want that look for a room later.
 
 ## Swapping in different background art
 
-The background images (`art/bg-*.jpg`) are plain images, replace the file with any image of the same name
-(ideally similar aspect ratio) and reload. Keep them people-free (empty rooms/hallways) since this game gets
-shared with classmates.
+The background images (`art/bg-*.jpg`) are plain images, replace the file with any image of the same name (ideally similar aspect ratio, roughly 4:3) and reload. Keep them people-free (empty rooms/hallways) since this game gets shared with classmates.
 
-If you swap a background, you'll likely also want to reposition the puzzle objects. Each puzzle is a
-near-invisible hover-reveal hotspot placed directly on a real object in the photo (a bulletin board, a vent, a
-door), not a generic floating icon. These live in `game-engine.js` in the `SCENES_V1` and `SCENES_V2` objects: each level is an array
-of two scenes (hallway, then room), and each scene's `props` array has one entry per puzzle in that room, in
-order, with `cx`/`cy` pixel coordinates (in the photo's own pixel space, all sized to 1100px wide) and an `icon`
-emoji. Get coordinates by eyeballing the image and testing in the browser, reload and nudge `cx`/`cy` until the
-object lines up.
-
-## Versions (V1, V2, and future ones)
-
-Each version is its own set of four levels. **V1** is the original set (one room per level). **V2** is the newer set
-(a hallway and a room per level, illustrated scenes). The level-select screen opens on the **newest** version, and
-older ones are in the "Version" dropdown above the level cards, newest first.
-
-- V1 keeps its original level keys (`regular`, `ap1`, `apc`, `ib`), so every result already saved stays valid.
-- V2 keys are prefixed with `v2_` (`v2_regular`, and so on), so versions never share a saved result. A player
-  can finish every version, and only their first attempt at each level counts, same as before.
-- Finished levels get a check mark on their card, per player account, on any device. The dropdown also shows
-  "x / 4 done" per version.
-- Results show up as "V1 Level 1" / "V2 Level 1" on the dashboard.
-- Progress inside a level is not saved. Closing the tab midway restarts that level.
-
-**Adding a new version (say V3):**
-
-1. Copy `content-v2.js` to `content-v3.js` and rename `LEVEL_META_V2`, `LEVELS_V2` and `EQUATIONS_V2` to the `_V3`
-   names (also the `title:` lines, "Physics Explorer V3"). Edit the questions.
-2. Add `<script src="content-v3.js"></script>` to `index.html`, before `game-engine.js`.
-3. In `game-engine.js`, add a `SCENES_V3` object next to `SCENES_V2` (backgrounds and button positions), and add a
-   new entry to the **end** of the `LEVEL_SETS` list with `id: "v3"`, `label: "V3"`, `prefix: "v3_"`, and its
-   `meta`, `levels` and `scenes`. The last entry in that list is the one that opens by default.
+If you swap a background, you'll likely also want to reposition the puzzle "props", each room's three puzzles are drawn as objects directly onto real things in the photo (a basketball in a hoop, an envelope in a mail slot, a note on a whiteboard, etc.), not generic floating icons. These live in `game-engine.js` in the `ROOM_SCENES` array: each prop has `cx`/`cy` pixel coordinates (in the photo's own 1100×825 space) plus a `type` (`basketball`, `envelope`, `note`, `clipboard`, `sheetmusic`, or `tuningfork`) and a matching reward animation when solved. A room can also have a `door` (real photographed door, with coordinates for its click region), if the photo has no door, the room falls back to a plain "Continue" button once all three puzzles are solved. Get coordinates by eyeballing the image and testing in the browser, reload and nudge `cx`/`cy` until the object lines up.
 
 ## Editing questions
 
-Open `content-v2.js` (or `content-v1.js` for the original levels, which have one room per level). In V2 each level has two rooms (a hallway with 2 puzzles, a main room with 3), each with a
-`puzzles` array. Copy an existing puzzle block and edit the text:
+Open `content.js`. Each room has a `puzzles` array. Copy an existing puzzle block and edit the text:
 
-- `type`: `"numeric"` (a calculated answer) or `"multipart"` (several sub-answers in one puzzle, see below)
-- `prompt`: the question text (a `{{name}}` placeholder shows as `???` until an earlier clue reveals it)
-- `answer`: the correct number (numeric only)
+- `type`: `"mcq"` (multiple choice), `"numeric"` (a calculated answer), or `"text"` (short word answer)
+- `prompt`: the question text
+- `options`: only for `mcq`, list of choices
+- `answer`: the correct choice (mcq), correct number (numeric), or correct word (text)
 - `hint`: optional hint text
-- `contribution`: a short string (usually 1 character) awarded when solved
-- `reveal`: `{ text, card: { name, value, label } }`, the story text shown after solving, and (except on the
-  last clue) a card handed to the player. `card.name` must match a `{{name}}` placeholder in a later clue.
+- `contribution`: a short string (usually 1 letter) awarded when solved
 
-All `contribution`s across both rooms, in order, form the level's final code, computed automatically, you
-don't need to manage it.
+All `contribution`s across all rooms, in order, form the final door code, this is computed automatically, you don't need to manage it.
 
-You can add more puzzles to a room (and a matching prop in `SCENES`), or change the theme/title/intro text at
-the top of the file.
+You can add more puzzles to a room, add more rooms (copy a room block), or change the theme/title/intro text at the top of the file.
 
 ## Stories, clue order and equations
 
-Each level is its own story told across two rooms (a hallway, then the room it leads into), five clues total,
-solved in order. Every clue after the first has a `{{name}}` placeholder in its `prompt` that shows as `???`
-until the player places the matching clue card (see `reveal.card` above). Nothing tells the player which clue a
-card belongs to, they reread their clues and work it out. The `contribution` characters are the code the player
-types in (Levels 1, 3, 4), the piano notes (none currently, see `mode: "melody"` in `game-engine.js` if you want
-one), or not shown at all for a key hunt (Level 2). They only ever appear inside the clue itself.
+Each level is its own story in one room, with five clues solved in order. Every clue after the first has a
+`{{name}}` placeholder in its `prompt` that shows as `???` until the clue before it is solved. That earlier
+clue's `reveal.give` supplies the value (see the notes at the top of `content.js`). The `contribution`
+characters are the code letters (Levels 1 and 4) or the piano notes (Level 3). They only show inside the clue itself, so players reread their clues and put the code together on their own.
 
-The "Extra clues" switch on the home page adds a light switch to each room. Flipped to dark, that room's
-equations glow on the walls, floors and ceilings. The lists they sit in are set by `eqBlocks` per scene in
-`game-engine.js`, and the equations themselves live in the `EQUATIONS_V1` and `EQUATIONS_V2` objects in the content files, keyed by puzzle
-id (`_0` and `_{out}` make subscripts). Whether it was on is saved with the result (`equationsOn`) and shown on
-the dashboard.
+The "Extra clues" switch on the home page adds a control to the room (a light switch in the gym and music
+room, a clickable sun that turns into a moon at the office and tech lot). With it flipped to dark, each level's equations glow on
+the walls, floors and ceilings. The lists they sit in are set by `eqBlocks` in `game-engine.js`, and the equations
+themselves live in the `EQUATIONS` object in `content.js`, keyed by puzzle id (`_0` and `_{out}` make subscripts). Whether it was on is saved with
+the result (`equationsOn`) and shown on the dashboard.
 
 ## Setting up Google sign-in and result tracking
 
