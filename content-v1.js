@@ -4,7 +4,7 @@
   Edit the text between quotes to swap in your own questions.
   Do NOT rename any keys (type, prompt, answer, etc.), only change the values.
 
-  There are four difficulty LEVELS (LEVEL_META below controls the buttons on the
+  There are four difficulty levels (LEVEL_META_V1 below controls the buttons on the
   level-select screen). Each level is its own story, set in one room, with five
   clues that have to be solved IN ORDER.
 
@@ -46,17 +46,17 @@
 // Ranked easiest to hardest: regular Physics (single-step algebra), then
 // AP Physics 1 (multi-concept algebra), then AP Physics C (calculus), then
 // IB Physics (broadest topic range, every question is multi-part).
-const LEVEL_META = [
+const LEVEL_META_V1 = [
   { key: "regular", label: "Level 1", story: "Coach's Locked Playbook" },
   { key: "ap1", label: "Level 2", story: "The Locked Meeting" },
   { key: "apc", label: "Level 3", story: "The Lost Melody" },
   { key: "ib", label: "Level 4", story: "Load-Out Night" },
 ];
 
-const LEVELS = {
+const LEVELS_V1 = {
   // ---------------------------------------------------------------
   regular: {
-    title: "Physics Explorer, Level 1",
+    title: "Physics Explorer V1, Level 1",
     storyTitle: "Coach's Locked Playbook",
     intro:
       "It's the night before the big game, and Coach locked the playbook in the equipment cage. " +
@@ -144,7 +144,7 @@ const LEVELS = {
 
   // ---------------------------------------------------------------
   ap1: {
-    title: "Physics Explorer, Level 2",
+    title: "Physics Explorer V1, Level 2",
     storyTitle: "The Locked Meeting",
     intro:
       "You're the student aide carrying the signed field trip forms, but the staff meeting already " +
@@ -233,7 +233,7 @@ const LEVELS = {
 
   // ---------------------------------------------------------------
   apc: {
-    title: "Physics Explorer, Level 3",
+    title: "Physics Explorer V1, Level 3",
     storyTitle: "The Lost Melody",
     intro:
       "The last part of the school concert piece has gone missing from the music room. The music " +
@@ -321,7 +321,7 @@ const LEVELS = {
 
   // ---------------------------------------------------------------
   ib: {
-    title: "Physics Explorer, Level 4",
+    title: "Physics Explorer V1, Level 4",
     storyTitle: "Load-Out Night",
     intro:
       "Team 7419's trailer leaves for the tournament in a few minutes, and the robot is still " +
@@ -433,7 +433,7 @@ const LEVELS = {
 // Equations shown as scattered notes in the room when the player turns on
 // "Extra clues" on the home page. Keyed by puzzle id. Repeats within a room
 // are collapsed into a single note.
-const EQUATIONS = {
+const EQUATIONS_V1 = {
   // Level 1
   phy1: ["p = mv"],
   phy2: ["a = v² / r"],
@@ -460,17 +460,17 @@ const EQUATIONS = {
   ib5: ["t = d / v", "P = Fv", "η = P_{out} / P_{in}"],
 };
 
-Object.values(LEVELS).forEach((level) => {
+Object.values(LEVELS_V1).forEach((level) => {
   level.rooms.forEach((room) => {
     room.puzzles.forEach((p) => {
-      p.equations = EQUATIONS[p.id] || [];
+      p.equations = EQUATIONS_V1[p.id] || [];
     });
   });
 });
 
 // Auto-built per level from each puzzle's `contribution`, in order.
 // Don't edit directly.
-Object.values(LEVELS).forEach((level) => {
+Object.values(LEVELS_V1).forEach((level) => {
   level.finalCode = level.rooms
     .flatMap((room) => room.puzzles.map((p) => p.contribution))
     .join("");
